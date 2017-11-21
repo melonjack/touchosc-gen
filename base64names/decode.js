@@ -1,6 +1,6 @@
 const fs = require('fs')
 
-var src = fs.readFileSync('index.xml', 'utf8');
+var src = fs.readFileSync('index2.xml', 'utf8');
 const src_str = String(src);
 const name = src_str.match(/name=\"[A-Za-z0-9+/=]*\"*/gi);
 
