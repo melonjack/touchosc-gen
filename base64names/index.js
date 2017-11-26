@@ -2,8 +2,6 @@ const fs = require('fs')
 const cheerio = require('cheerio');
 var src = fs.readFileSync('index.xml', 'utf8');
 const src_str = String(src);
-const name = src_str.match(/name=\"[A-Za-z0-9+/=]*\"*/gi);
-
 
 const r1 = src_str.replace(/name=\"([A-Za-z0-9+/=]*)\"*/gi, (match, offset, str, str2) => {
 	// console.log(str2)
@@ -23,8 +21,14 @@ const ccValue = (i) => {
 	return `${br}<midi var="x" type="0" channel="1" data1="${i}" data2f="0" data2t="127" sysex="" />\n`;
 }
 
+function convertBase64(offset) {
+	// console.log(str2)
+	var buf = new Buffer(offset, 'base64'); // Ta-da
+	return 'name="' + buf + '"';
+}
+
 const $ = cheerio.load(src_str, {xmlMode: true});
-$('control').each((i, item) => {
+$('control, tabpage').each((i, item) => {
 	const $item = $(item);
 	const type = $item.attr('type');
 	
@@ -37,8 +41,12 @@ $('control').each((i, item) => {
 			$(item).append(ccValue(i));
 		}
 	}
+
+	const itemname = $item.attr('name');
+	$item.attr('name', new Buffer(itemname, 'base64'));
+
 	console.log($(item).attr('name'));
 })
 
 
-fs.writeFile('test-' + Date.now() + '.xml', $.html());
+fs.writeFile('dest/test-' + Date.now() + '.xml', $.html(), err => err);
