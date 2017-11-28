@@ -1,15 +1,21 @@
 const fs = require('fs')
 const cheerio = require('cheerio');
 const ctl = require('./controls').ctl;
-var src = fs.readFileSync('./presets/index-3.xml', 'utf8');
+var src = fs.readFileSync('./presets/index-4.xml', 'utf8');
 const src_str = String(src);
 
 console.log(ctl);
 
-const ccValue = (i) => {
+const createMidi = (i, channel, number, min = 0, max = 127, ) => {
 	i = i || 0;
-	const br = i === 0 ? '\n' : ''
-	return `${br}<midi var="x" type="0" channel="1" data1="${i}" data2f="0" data2t="127" sysex="" />\n`;
+	const br = i === 0 ? '\n' : '';
+	if (!i) {
+		return `
+		<midi var="x" type="0" channel="${channel}" data1="${number}" data2f="${min}" data2t="${max}" sysex="" />\n`;
+
+	}
+	return `<midi var="x" type="0" channel="${channel}" data1="${number}" data2f="${min}" data2t="${max}" sysex="" />\n`;
+		
 }
 
 function convertBase64(offset) {
@@ -18,32 +24,110 @@ function convertBase64(offset) {
 	return 'name="' + buf.toString('utf8') + '"';
 }
 
-const $ = cheerio.load(src_str, {xmlMode: true});
-$('control, tabpage').each((i, item) => {
-	const $item = $(item);
-	const type = $item.attr('type');
-	// console.log($item.attr('x'), $item.attr('y'));
+function channel(alias) {
+	const dict = midi();
 
-	if (type === 'faderh') {
-		$(item).html(ccValue());
-	} else if (type === 'multitoggle') {
-		$(item).html('');
-		const number_y = +$item.attr('number_y');
-		for (var i = 0; i < number_y; i++) {
-			$(item).append(ccValue(i));
-		}
+	if (dict[1].indexOf(alias) !== -1) {
+		return 1;
 	}
 
-	const itemname = $item.attr('name');
-	$item.attr('name', new Buffer(itemname, 'base64'));
+	if (dict[10].indexOf(alias) !== -1) {
+		return 10;
+	}
 
-	// console.log($(item).attr('name'));
+	if (dict[11].indexOf(alias) !== -1) {
+		return 11;
+	}
+}
+
+function number($node, alias, page) {
+	const dict = midi();
+	const c = channel(alias);
+
+	if (c === 10) {
+		return (2 + page) * 10 + dict[10].indexOf(alias) + 1;
+	}
+
+	if (c === 11) {
+		return (3 + page) * 10 + dict[11].indexOf(alias) + 1;
+	}
+
+	if (c === 1) {
+		return 20 + page + dict[1].indexOf(alias) + 1
+	}
+}
+
+function toggleVal(i) {
+	const vals = [0, 17, 33, 49, 66, 82, 98, 127];
+	return vals[i];
+}
+
+const $ = cheerio.load(src_str, {xmlMode: true});
+$('tabpage').each((page, item) => {
+	if (page >= 8) return
+	
+	$(item).find('control').each((j, citem) => {
+		const $node = $(citem);
+		const alias = ctl($node);
+
+		const type = $node.attr('type');
+
+		if (type === 'faderh') {
+			$node.append(createMidi(
+				j,
+				channel(alias),
+				number($node, alias, page),
+				0,
+				127
+			))
+		} else if (type === 'multitoggle') {
+			const klen = +$node.attr('number_x') * +$node.attr('number_y');
+			for (let k = 0; k < klen; k++) {
+
+				$node.append(createMidi(
+					k,
+					channel(alias),
+					number($node, alias, page),
+					klen === 8 ? toggleVal(k): [0, 127][k],
+					klen === 8 ? toggleVal(k): [0, 127][k]
+				))				
+			}
+		}
+		// $node.attr('alias', alias);
+	})
 })
 
-$('tabpage').first().find('control').each((i, item) => {
-	const $node = $(item);
-	console.log(ctl($node));
-})
 
+function midi() {
+	const dict = {
 
-// fs.writeFile('dest/test-' + Date.now() + '.xml', $.html(), err => err);
+		// sends
+		1: [
+			'deplaysteps',
+			'delaymix',
+			'reversesteps',
+			'reversemix'
+		],
+		// gate
+		10: [
+			'gateon',
+			'gatehold',
+			'gaterate'
+		],
+		// pitcj
+		11: [
+			'pitchon',
+			'pitchrate',
+			'pitchsteps',
+			'pitchgate',
+			'pitchdis',
+			'rnd',
+			'choice',
+			'scale',
+			'drop',
+		]
+	}
+	return dict;
+}
+
+fs.writeFile('dest/test-' + Date.now() + '.xml', $.html(), err => err);

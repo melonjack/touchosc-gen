@@ -6,18 +6,24 @@ exports.ctl = function ($node) {
 	const y = 768 - 40 - Number($node.attr('x')) - Number($node.attr('w'));
 
 	switch ([x, y].join(' ')) {
+
+		// midi 10
 		case '0 50':
 			return 'gateon';
 		case '100 50':
 			return 'gatehold';
 		case '0 100':
 			return 'gaterate'
+		
+		// midi11
 		case '450 50':
 			return 'pitchon'
 		case '450 100':
 			return 'pitchrate'
 		case '450 200':
 			return 'pitchsteps'
+
+			
 		case '850 100':
 			return 'pitchgate'
 		case '900 100':
@@ -30,6 +36,8 @@ exports.ctl = function ($node) {
 			return 'scale'
 		case '250 300':
 			return 'drop'
+		
+		// midi 1
 		case '0 550':
 			return 'deplaysteps'
 		case '400 500':
@@ -39,7 +47,7 @@ exports.ctl = function ($node) {
 		case '850 500':
 			return 'reversemix'
 		default:
-			return n + ': unknown' + x + ' ' + y;
+			return n + ': ' + x + ' ' + y;
 
 	}
 };

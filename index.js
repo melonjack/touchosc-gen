@@ -1,8 +1,12 @@
 const fs = require('fs')
 const cheerio = require('cheerio');
 var src = fs.readFileSync('index.xml', 'utf8');
-const src_str = String(src);
+const ini = require('ini')
 
+const config = ini.parse(fs.readFileSync('./config.ini', 'utf-8'));
+
+const src_str = String(src);
+console.log(config);
 const r1 = src_str.replace(/name=\"([A-Za-z0-9+/=]*)\"*/gi, (match, offset, str, str2) => {
 	// console.log(str2)
 	var buf = new Buffer(offset, 'base64'); // Ta-da
@@ -45,8 +49,8 @@ $('control, tabpage').each((i, item) => {
 	const itemname = $item.attr('name');
 	$item.attr('name', new Buffer(itemname, 'base64'));
 
-	console.log($(item).attr('name'));
-})
+	// console.log($(item).attr('name'));1
+});
 
 
-fs.writeFile('dest/test-' + Date.now() + '.xml', $.html(), err => err);
+// fs.writeFile('dest/test-' + Date.now() + '.xml', $.html(), err => err);
