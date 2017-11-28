@@ -1,20 +1,13 @@
 const fs = require('fs')
 const cheerio = require('cheerio');
 const ctl = require('./controls').ctl;
-var src = fs.readFileSync('./presets/index-4.xml', 'utf8');
+var src = fs.readFileSync('./src/index.xml', 'utf8');
 const src_str = String(src);
 
 console.log(ctl);
 
 const createMidi = (i, channel, number, min = 0, max = 127, ) => {
-	i = i || 0;
-	const br = i === 0 ? '\n' : '';
-	if (!i) {
-		return `
-		<midi var="x" type="0" channel="${channel}" data1="${number}" data2f="${min}" data2t="${max}" sysex="" />\n`;
-
-	}
-	return `<midi var="x" type="0" channel="${channel}" data1="${number}" data2f="${min}" data2t="${max}" sysex="" />\n`;
+	return `<midi var="x" type="0" channel="${channel}" data1="${number}" data2f="${min}" data2t="${max}" sysex="" />`;
 		
 }
 
@@ -73,7 +66,7 @@ $('tabpage').each((page, item) => {
 		const type = $node.attr('type');
 
 		if (type === 'faderh') {
-			$node.append(createMidi(
+			$node.html('').append(createMidi(
 				j,
 				channel(alias),
 				number($node, alias, page),
@@ -81,6 +74,7 @@ $('tabpage').each((page, item) => {
 				127
 			))
 		} else if (type === 'multitoggle') {
+			$node.html('');
 			const klen = +$node.attr('number_x') * +$node.attr('number_y');
 			for (let k = 0; k < klen; k++) {
 
