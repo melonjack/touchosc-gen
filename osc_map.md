@@ -10,28 +10,25 @@ pitch random:
  - chance - cc
  - choices - cc
  - scale - cc
-
 gate-fx:
  - on/off - 2step
 gate arp:
  - hold on/off - 2step [set note length]
  - rate 8step
-sample-looper-deplay
+sample-looper-deplay:
  - time - 8steps
  - mix - cc
  - R-time - 8step
  - R-mix - cc
-
- --CC--
-
- 1 
- 1/2
- 1/3
- 1/4
- 1/6
- 1/8
- 1/12
- 1/16
+CC:
+ - 1 	
+ - 1/2
+ - 1/3
+ - 1/4
+ - 1/6
+ - 1/8
+ - 1/12
+ - 1/16
  
  128/8 = 16
  16, 32, 48, 64, 80, 96, 112, 128

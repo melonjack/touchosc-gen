@@ -46,4 +46,4 @@ $('tabpage').first().find('control').each((i, item) => {
 })
 
 
-fs.writeFile('dest/test-' + Date.now() + '.xml', $.html(), err => err);
+// fs.writeFile('dest/test-' + Date.now() + '.xml', $.html(), err => err);
