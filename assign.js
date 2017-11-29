@@ -6,9 +6,9 @@ const src_str = String(src);
 
 console.log(ctl);
 
-const createMidi = (i, channel, number, min = 0, max = 127, ) => {
-	return `<midi var="x" type="0" channel="${channel}" data1="${number}" data2f="${min}" data2t="${max}" sysex="" />`;
-		
+const createMidi = (i, channel, number, min = 0, max = 127, id = '') => {
+	return `
+	<midi var="x${id}" type="0" channel="${channel}" data1="${number}" data2f="${min}" data2t="${max}" sysex="" />\n`;
 }
 
 function convertBase64(offset) {
@@ -71,19 +71,21 @@ $('tabpage').each((page, item) => {
 				channel(alias),
 				number($node, alias, page),
 				0,
-				127
+				127,
+				''
 			))
 		} else if (type === 'multitoggle') {
 			$node.html('');
 			const klen = +$node.attr('number_x') * +$node.attr('number_y');
 			for (let k = 0; k < klen; k++) {
-
+				$node.attr('exclusive', 'true');
 				$node.append(createMidi(
 					k,
 					channel(alias),
 					number($node, alias, page),
 					klen === 8 ? toggleVal(k): [0, 127][k],
-					klen === 8 ? toggleVal(k): [0, 127][k]
+					klen === 8 ? toggleVal(k): [0, 127][k],
+					klen - k
 				))				
 			}
 		}
