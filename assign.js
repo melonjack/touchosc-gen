@@ -7,8 +7,8 @@ const src_str = String(src);
 console.log(ctl);
 
 const createMidi = (i, channel, number, min = 0, max = 127, id = '') => {
-	return `
-	<midi var="x${id}" type="0" channel="${channel}" data1="${number}" data2f="${min}" data2t="${max}" sysex="" />\n`;
+
+	return `<midi var ="x${id}" type="0" channel="${channel}" data1="${number}" data2f="${min}" data2t="${max}" sysex="" />`;
 }
 
 function convertBase64(offset) {
@@ -31,6 +31,7 @@ function channel(alias) {
 	if (dict[11].indexOf(alias) !== -1) {
 		return 11;
 	}
+	console.log(alias)
 }
 
 function number($node, alias, page) {
@@ -62,11 +63,10 @@ $('tabpage').each((page, item) => {
 	$(item).find('control').each((j, citem) => {
 		const $node = $(citem);
 		const alias = ctl($node);
-
+		// const nm = new Buffer($node.attr('name'), 'base64');
 		const type = $node.attr('type');
-
 		if (type === 'faderh') {
-			$node.html('').append(createMidi(
+			$node.html(createMidi(
 				j,
 				channel(alias),
 				number($node, alias, page),
@@ -75,10 +75,11 @@ $('tabpage').each((page, item) => {
 				''
 			))
 		} else if (type === 'multitoggle') {
+			// return;
 			$node.html('');
 			const klen = +$node.attr('number_x') * +$node.attr('number_y');
 			for (let k = 0; k < klen; k++) {
-				$node.attr('exclusive', 'true');
+				// $node.attr('exclusive', 'true');
 				$node.append(createMidi(
 					k,
 					channel(alias),
@@ -126,4 +127,4 @@ function midi() {
 	return dict;
 }
 
-fs.writeFile('dest/test-' + Date.now() + '.xml', $.html(), err => err);
+fs.writeFile('dest/index.xml', $.html(), err => err);
