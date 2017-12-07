@@ -1,13 +1,12 @@
 const fs = require('fs')
 const cheerio = require('cheerio');
+const {execSync} = require('child_process');
 const ctl = require('./controls').ctl;
 var src = fs.readFileSync('./src/index.xml', 'utf8');
 const src_str = String(src);
-
-console.log(ctl);
+const beautify = require('xml-beautifier');
 
 const createMidi = (i, channel, number, min = 0, max = 127, id = '') => {
-
 	return `<midi var ="x${id}" type="0" channel="${channel}" data1="${number}" data2f="${min}" data2t="${max}" sysex="" />`;
 }
 
@@ -52,14 +51,16 @@ function number($node, alias, page) {
 }
 
 function toggleVal(i) {
-	const vals = [0, 17, 33, 49, 66, 82, 98, 127];
+	const vals = [0, 17, 33, 49, 66, 82, 100, 127];
 	return vals[i];
 }
 
 const $ = cheerio.load(src_str, {xmlMode: true});
+
 $('tabpage').each((page, item) => {
 	if (page >= 8) return
-	
+	const dict = midi();
+
 	$(item).find('control').each((j, citem) => {
 		const $node = $(citem);
 		const alias = ctl($node);
@@ -75,22 +76,24 @@ $('tabpage').each((page, item) => {
 				''
 			))
 		} else if (type === 'multitoggle') {
+
+			const isLinear = dict[1].indexOf(alias) !== -1;
 			// return;
 			$node.html('');
 			const klen = +$node.attr('number_x') * +$node.attr('number_y');
 			for (let k = 0; k < klen; k++) {
-				// $node.attr('exclusive', 'true');
+				$node.attr('ex_mode', 'true');
 				$node.append(createMidi(
 					k,
 					channel(alias),
 					number($node, alias, page),
-					klen === 8 ? toggleVal(k): [0, 127][k],
-					klen === 8 ? toggleVal(k): [0, 127][k],
-					klen - k
+					klen === 8 ? (isLinear ? k : toggleVal(k)): [0, 127][k],
+					klen === 8 ? (isLinear ? k : toggleVal(k)): [0, 127][k],
+					k + 1
 				))				
 			}
 		}
-		// $node.attr('alias', alias);
+		
 	})
 })
 
@@ -127,4 +130,11 @@ function midi() {
 	return dict;
 }
 
-fs.writeFile('dest/index.xml', $.html(), err => err);
+console.log(process.cwd());
+process.chdir('dest');
+
+fs.writeFileSync('index.xml', $.html());
+fs.writeFileSync('index-pretty.xml', beautify($.html()));
+execSync('rm -f index.xml.zip index.xml.zip.touchosc');
+execSync('zip -r -X index.xml.zip index.xml')
+execSync('mv index.xml.zip index.xml.zip.touchosc');
