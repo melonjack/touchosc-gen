@@ -51,3 +51,33 @@ exports.ctl = function ($node) {
 
 	}
 };
+
+
+function mapping(x, y) { 
+	const coords = {
+		'0 50': 'gateon';
+		'100 50': 'gatehold';
+		'0 100': 'gaterate'
+		
+		// midi11
+		'450 50': 'pitchon'
+		'450 100': 'pitchrate'
+		'450 200': 'pitchsteps'
+
+			
+		'850 100': 'pitchgate'
+		'900 100': 'pitchdis'
+		'100 300': 'rnd'
+		'150 300': 'choice'
+		'200 300': 'scale'
+		'250 300': 'drop'
+		
+		// midi 1
+		'0 550': 'deplaysteps'
+		'400 500': 'delaymix'
+		'450 550': 'reversesteps'
+		'850 500': 'reversemix'
+
+	};
+	return coords[`${x} ${y}`];
+}
