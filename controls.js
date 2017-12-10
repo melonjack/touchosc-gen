@@ -14,51 +14,7 @@ exports.ctl = function ($node, $) {
 		console.log( errors.join('\n'));
 	}
 
-	switch ([x, y].join(' ')) {
-
-		// midi 10
-		case '0 50':
-			return 'gateon';
-		case '100 50':
-			return 'gatehold';
-		case '0 100':
-			return 'gaterate'
-		
-		// midi11
-		case '450 50':
-			return 'pitchon'
-		case '450 100':
-			return 'pitchrate'
-		case '450 200':
-			return 'pitchsteps'
-
-			
-		case '850 100':
-			return 'pitchgate'
-		case '900 100':
-			return 'pitchdis'
-		case '100 300':
-			return 'rnd'
-		case '150 300':
-			return 'choice'
-		case '200 300':
-			return 'scale'
-		case '250 300':
-			return 'drop'
-		
-		// midi 1
-		case '0 550':
-			return 'deplaysteps'
-		case '400 500':
-			return 'delaymix'
-		case '450 550':
-			return 'reversesteps'
-		case '850 500':
-			return 'reversemix'
-		default:
-			return n + ': ' + x + ' ' + y;
-
-	}
+	return mapping(x, y);
 };
 
 
@@ -81,12 +37,14 @@ function mapping(x, y) {
 		'200 300': 'scale',
 		'250 300': 'drop',
 		
-		// midi 1
-		'0 550': 'deplaysteps',
-		'400 500': 'delaymix',
-		'450 550': 'reversesteps',
-		'850 500': 'reversemix',
-
+		// midi 12
+		'0 550': 'deplaytime',
+		'400 500': 'delayfb',
+		'450 500': 'delaymix',
+		'550 500': 'chor_delayfb',
+		'700 500': 'chor_mix',
+		'800 500': 'eros_cutres',
+		'895 500': 'eros_bw'
 	};
 	return coords[`${x} ${y}`];
 }

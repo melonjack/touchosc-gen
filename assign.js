@@ -8,9 +8,12 @@ var src = fs.readFileSync('./src/index.xml', 'utf8');
 const src_str = String(src);
 const beautify = require('xml-beautifier');
 
-const createMidi = (i, channel, number, min = 0, max = 127, id = '') => {
+const createMidi = ({
+	uid, channel, number, min = 0, max = 127, id = '', axis = 'x'
+}) => {
 	return channel ? 
-		`<midi var ="x${id}" type="0" channel="${channel}" data1="${number}" data2f="${min}" data2t="${max}" sysex="" />` :
+		//<midi var="y1" type="0" channel="12" data1="22" data2f="0" data2t="127" sysex=""/>
+		`<midi var ="${axis}${id}" type="0" channel="${channel}" data1="${number}" data2f="${min}" data2t="${max}" sysex="" />` :
 		'';
 
 }
@@ -35,6 +38,10 @@ function channel(alias) {
 	if (dict[11].indexOf(alias) !== -1) {
 		return 11;
 	}
+
+	if (dict[12].indexOf(alias) !== -1) {
+		return 12;
+	}
 	
 	console.log(`unknown position: ${alias}`);
 }
@@ -44,14 +51,22 @@ function number($node, alias, page) {
 	const c = channel(alias);
 
 	if (c === 10) {
+		// cc 21...29
 		return (2 + page) * 10 + dict[10].indexOf(alias) + 1;
 	}
 
 	if (c === 11) {
+		// cc 31...39		
 		return (3 + page) * 10 + dict[11].indexOf(alias) + 1;
 	}
 
+	if (c === 12) {
+		// cc 41...49		
+		return (4 + page) * 10 + dict[12].indexOf(alias) + 1;
+	}
+
 	if (c === 1) {
+		// cc 21...29
 		return 20 + page + dict[1].indexOf(alias) + 1
 	}
 
@@ -74,32 +89,42 @@ $('tabpage').each((page, item) => {
 		const alias = ctl($node, $);
 		// const nm = new Buffer($node.attr('name'), 'base64');
 		const type = $node.attr('type');
+
 		if (type === 'faderh') {
-			$node.html(createMidi(
-				j,
-				channel(alias),
-				number($node, alias, page),
-				0,
-				127,
-				''
-			))
+			$node.html(createMidi({
+				uid: j,
+				channel: channel(alias),
+				number: number($node, alias, page)
+			}))
 		} else if (type === 'multitoggle') {
 
 			const isLinear = dict[1].indexOf(alias) !== -1;
-			// return;
 			$node.html('');
 			const klen = +$node.attr('number_x') * +$node.attr('number_y');
 			for (let k = 0; k < klen; k++) {
 				$node.attr('ex_mode', 'true');
-				$node.append(createMidi(
-					k,
-					channel(alias),
-					number($node, alias, page),
-					klen === 8 ? (isLinear ? k : toggleVal(k)): [0, 127][k],
-					klen === 8 ? (isLinear ? k : toggleVal(k)): [0, 127][k],
-					k + 1
-				))				
+				$node.append(createMidi({
+					uid: k,
+					channel: channel(alias),
+					number: number($node, alias, page),
+					min: klen === 8 ? (isLinear ? k : toggleVal(k)): [0, 127][k],
+					max: klen === 8 ? (isLinear ? k : toggleVal(k)): [0, 127][k],
+					id: k + 1
+				}))				
 			}
+		} else if (type === 'multixy') {
+			$node.append(createMidi({
+				uid: j,
+				channel: channel(alias),
+				number: number($node, alias, page),
+				axis: 'x'
+			}));
+			$node.append(createMidi({
+				uid: j + 0.5,
+				channel: channel(alias),
+				number: number($node, alias, page),
+				axis: 'y'
+			}))
 		}
 		
 	})
@@ -133,6 +158,16 @@ function midi() {
 			'choice',
 			'scale',
 			'drop',
+		],
+		// audio fx
+		12: [
+			'deplaytime',
+			'delayfb',
+			'delaymix',
+			'chor_delayfb',
+			'chor_mix',
+			'eros_cutres',
+			'eros_bw'
 		]
 	}
 	return dict;
