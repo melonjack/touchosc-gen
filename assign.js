@@ -27,10 +27,6 @@ function convertBase64(offset) {
 function channel(alias) {
 	const dict = midi();
 
-	if (dict[1].indexOf(alias) !== -1) {
-		return 1;
-	}
-
 	if (dict[10].indexOf(alias) !== -1) {
 		return 10;
 	}
@@ -61,8 +57,8 @@ function number($node, alias, page) {
 	}
 
 	if (c === 12) {
-		// cc 41...49		
-		return (4 + page) * 10 + dict[12].indexOf(alias) + 1;
+		// cc 21...29		
+		return (2 + page) * 10 + dict[12].indexOf(alias) + 1;
 	}
 
 	if (c === 1) {
@@ -97,34 +93,51 @@ $('tabpage').each((page, item) => {
 				number: number($node, alias, page)
 			}))
 		} else if (type === 'multitoggle') {
-
-			const isLinear = dict[1].indexOf(alias) !== -1;
 			$node.html('');
 			const klen = +$node.attr('number_x') * +$node.attr('number_y');
+			const toggle8step = klen === 8;
 			for (let k = 0; k < klen; k++) {
 				$node.attr('ex_mode', 'true');
 				$node.append(createMidi({
 					uid: k,
 					channel: channel(alias),
 					number: number($node, alias, page),
-					min: klen === 8 ? (isLinear ? k : toggleVal(k)): [0, 127][k],
-					max: klen === 8 ? (isLinear ? k : toggleVal(k)): [0, 127][k],
+					min: toggle8step ? toggleVal(k): [0, 127][k]/* assume toggle2step */,
+					max: toggle8step ? toggleVal(k): [0, 127][k],
 					id: k + 1
 				}))				
 			}
 		} else if (type === 'multixy') {
-			$node.append(createMidi({
+			console.log(createMidi({
 				uid: j,
 				channel: channel(alias),
 				number: number($node, alias, page),
-				axis: 'x'
+				axis: 'x',
+				id: 1
+			}));
+			$node.html(createMidi({
+				uid: j,
+				channel: channel(alias),
+				number: number($node, alias, page),
+				axis: 'x',
+				id: 1
+
 			}));
 			$node.append(createMidi({
 				uid: j + 0.5,
 				channel: channel(alias),
 				number: number($node, alias, page),
-				axis: 'y'
+				axis: 'y',
+				id: 1
 			}))
+			console.log(createMidi({
+				uid: j + 0.5,
+				channel: channel(alias),
+				number: number($node, alias, page),
+				axis: 'y',
+				id: 1
+			}))
+
 		}
 		
 	})
@@ -135,12 +148,12 @@ function midi() {
 	const dict = {
 
 		// sends
-		1: [
-			'deplaysteps',
-			'delaymix',
-			'reversesteps',
-			'reversemix'
-		],
+		// 1: [
+		// 	'deplaysteps',
+		// 	'delaymix',
+		// 	'reversesteps',
+		// 	'reversemix'
+		// ],
 		// gate
 		10: [
 			'gateon',

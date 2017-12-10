@@ -6,15 +6,17 @@ exports.ctl = function ($node, $) {
 	const y = 768 - 40 - Number($node.attr('x')) - Number($node.attr('w'));
 
 	const errors = [];
+	const tabName = new Buffer($($node).parents('tabpage').attr('name'), 'base64');
 	if ( x % 5 !== 0 || y % 5 !== 0) {
-		const tabName = new Buffer($($node).parents('tabpage').attr('name'), 'base64');
+		
 		errors.push(`tabpage ${tabName}, ${x} ${y} ${n} incorrect position, should be divided by 5`);
 	}
 	if (errors.length) {
-		console.log( errors.join('\n'));
+		console.log(errors.join('\n'));
 	}
-
-	return mapping(x, y);
+	const m = mapping(x, y);
+	m === undefined && n !== 'labelv' && console.log(n, m, x, y, String(tabName));	
+	return m;
 };
 
 
@@ -29,7 +31,6 @@ function mapping(x, y) {
 		'450 100': 'pitchrate',
 		'450 200': 'pitchsteps',
 
-			
 		'850 100': 'pitchgate',
 		'900 100': 'pitchdis',
 		'100 300': 'rnd',
@@ -38,13 +39,13 @@ function mapping(x, y) {
 		'250 300': 'drop',
 		
 		// midi 12
-		'0 550': 'deplaytime',
+		'0 550':   'deplaytime',
 		'400 500': 'delayfb',
 		'450 500': 'delaymix',
 		'550 500': 'chor_delayfb',
 		'700 500': 'chor_mix',
 		'800 500': 'eros_cutres',
-		'895 500': 'eros_bw'
+		'950 500': 'eros_bw'
 	};
 	return coords[`${x} ${y}`];
 }
