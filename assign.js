@@ -1,3 +1,5 @@
+#! /usr/bin/env node
+
 const fs = require('fs')
 const cheerio = require('cheerio');
 const {execSync} = require('child_process');
@@ -7,7 +9,10 @@ const src_str = String(src);
 const beautify = require('xml-beautifier');
 
 const createMidi = (i, channel, number, min = 0, max = 127, id = '') => {
-	return `<midi var ="x${id}" type="0" channel="${channel}" data1="${number}" data2f="${min}" data2t="${max}" sysex="" />`;
+	return channel ? 
+		`<midi var ="x${id}" type="0" channel="${channel}" data1="${number}" data2f="${min}" data2t="${max}" sysex="" />` :
+		'';
+
 }
 
 function convertBase64(offset) {
@@ -30,7 +35,8 @@ function channel(alias) {
 	if (dict[11].indexOf(alias) !== -1) {
 		return 11;
 	}
-	console.log(alias)
+	
+	console.log(`unknown position: ${alias}`);
 }
 
 function number($node, alias, page) {
@@ -48,6 +54,8 @@ function number($node, alias, page) {
 	if (c === 1) {
 		return 20 + page + dict[1].indexOf(alias) + 1
 	}
+
+	console.log('failed channel', c, alias);
 }
 
 function toggleVal(i) {
@@ -63,7 +71,7 @@ $('tabpage').each((page, item) => {
 
 	$(item).find('control').each((j, citem) => {
 		const $node = $(citem);
-		const alias = ctl($node);
+		const alias = ctl($node, $);
 		// const nm = new Buffer($node.attr('name'), 'base64');
 		const type = $node.attr('type');
 		if (type === 'faderh') {
