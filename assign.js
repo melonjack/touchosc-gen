@@ -76,10 +76,24 @@ function toggleVal(i) {
 
 const $ = cheerio.load(src_str, {xmlMode: true});
 
+const labelColorByPageId = (pageId) => {
+	return [
+		'brown',
+		'gray',
+		'brown',
+		'yellow',
+		'yellow',
+		'brown',
+		'brown',
+		'orange'
+	][pageId];
+}
+
 $('tabpage').each((page, item) => {
 	if (page >= 8) return
 	const dict = midi();
-
+	const $ctl = $(item).find('control');
+	
 	$(item).find('control').each((j, citem) => {
 		const $node = $(citem);
 		const alias = ctl($node, $);
@@ -112,32 +126,33 @@ $('tabpage').each((page, item) => {
 				uid: j,
 				channel: channel(alias),
 				number: number($node, alias, page),
-				axis: 'x',
+				axis: 'y',
 				id: 1
 			}));
 			$node.html(createMidi({
 				uid: j,
 				channel: channel(alias),
 				number: number($node, alias, page),
-				axis: 'x',
+				axis: 'y',
 				id: 1
 
 			}));
 			$node.append(createMidi({
 				uid: j + 0.5,
-				channel: channel(alias),
+				channel: 13,
 				number: number($node, alias, page),
-				axis: 'y',
+				axis: 'x',
 				id: 1
 			}))
 			console.log(createMidi({
 				uid: j + 0.5,
-				channel: channel(alias),
-				number: number($node, alias, page),
-				axis: 'y',
+				channel: 13,
+				number: number($node, alias, page) + 1,
+				axis: 'x',
 				id: 1
 			}))
-
+		} else if (type === 'labelv') {
+			$node.attr('color', labelColorByPageId(page));
 		}
 		
 	})
