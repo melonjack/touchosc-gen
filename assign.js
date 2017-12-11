@@ -16,9 +16,9 @@ const createMidi = ({
 		`<midi var ="${axis}${id}" type="0" channel="${channel}" data1="${number}" data2f="${min}" data2t="${max}" sysex="" />` :
 		'';
 
-}
+	}
 
-function convertBase64(offset) {
+	function convertBase64(offset) {
 	// console.log(str2)
 	var buf = new Buffer(offset, 'base64'); // Ta-da
 	return 'name="' + buf.toString('utf8') + '"';
@@ -78,34 +78,52 @@ const $ = cheerio.load(src_str, {xmlMode: true});
 
 const labelColorByPageId = (pageId) => {
 	return [
-		'brown',
-		'gray',
-		'brown',
-		'yellow',
-		'yellow',
-		'brown',
-		'brown',
-		'orange'
+	'yellow',
+	'red',
+	'green',
+	'blue',
+	'purple',
+	'gray',
+	'orange',
+	'brown'
 	][pageId];
 }
 
 $('tabpage').each((page, item) => {
-	if (page >= 8) return
 	const dict = midi();
 	const $ctl = $(item).find('control');
-	
+
 	$(item).find('control').each((j, citem) => {
 		const $node = $(citem);
 		const alias = ctl($node, $);
 		// const nm = new Buffer($node.attr('name'), 'base64');
 		const type = $node.attr('type');
+		
+		$node.attr('color', labelColorByPageId(page));
+		
+		if (type === 'faderh' || type === 'rotaryh') {			
+			if (page > 7 || type === 'rotaryh') {		
 
-		if (type === 'faderh') {
-			$node.html(createMidi({
-				uid: j,
-				channel: channel(alias),
-				number: number($node, alias, page)
-			}))
+				const coords = {
+					x: $node.attr('y'),
+					y: 768 - 40 - Number($node.attr('x')) - Number($node.attr('w'))
+				}
+				const x = 1 + coords.x/120;
+				const y = 1 + coords.y/120;
+				console.log('x', x, 'y', y, '' + (y + 1) + '' + x);
+
+				$node.html(createMidi({
+					uid: j,
+					channel: 9,
+					number: '' + (y + 1) + '' + x
+				}))			
+			} else {
+				$node.html(createMidi({
+					uid: j,
+					channel: channel(alias),
+					number: number($node, alias, page)
+				}))
+							}
 		} else if (type === 'multitoggle') {
 			$node.html('');
 			const klen = +$node.attr('number_x') * +$node.attr('number_y');
@@ -122,13 +140,6 @@ $('tabpage').each((page, item) => {
 				}))				
 			}
 		} else if (type === 'multixy') {
-			console.log(createMidi({
-				uid: j,
-				channel: channel(alias),
-				number: number($node, alias, page),
-				axis: 'y',
-				id: 1
-			}));
 			$node.html(createMidi({
 				uid: j,
 				channel: channel(alias),
@@ -144,17 +155,7 @@ $('tabpage').each((page, item) => {
 				axis: 'x',
 				id: 1
 			}))
-			console.log(createMidi({
-				uid: j + 0.5,
-				channel: 13,
-				number: number($node, alias, page) + 1,
-				axis: 'x',
-				id: 1
-			}))
-		} else if (type === 'labelv') {
-			$node.attr('color', labelColorByPageId(page));
-		}
-		
+		} 
 	})
 })
 
@@ -171,31 +172,31 @@ function midi() {
 		// ],
 		// gate
 		10: [
-			'gateon',
-			'gatehold',
-			'gaterate'
+		'gateon',
+		'gatehold',
+		'gaterate'
 		],
 		// pitcj
 		11: [
-			'pitchon',
-			'pitchrate',
-			'pitchsteps',
-			'pitchgate',
-			'pitchdis',
-			'rnd',
-			'choice',
-			'scale',
-			'drop',
+		'pitchon',
+		'pitchrate',
+		'pitchsteps',
+		'pitchgate',
+		'pitchdis',
+		'rnd',
+		'choice',
+		'scale',
+		'drop',
 		],
 		// audio fx
 		12: [
-			'deplaytime',
-			'delayfb',
-			'delaymix',
-			'chor_delayfb',
-			'chor_mix',
-			'eros_cutres',
-			'eros_bw'
+		'deplaytime',
+		'delayfb',
+		'delaymix',
+		'chor_delayfb',
+		'chor_mix',
+		'eros_cutres',
+		'eros_bw'
 		]
 	}
 	return dict;

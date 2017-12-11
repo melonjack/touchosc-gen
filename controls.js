@@ -15,7 +15,7 @@ exports.ctl = function ($node, $) {
 		console.log(errors.join('\n'));
 	}
 	const m = mapping(x, y);
-	m === undefined && n !== 'labelv' && console.log(n, m, x, y, String(tabName));	
+	// m === undefined && n !== 'labelv' && console.log(n, m, x, y, String(tabName));	
 	return m;
 };
 
