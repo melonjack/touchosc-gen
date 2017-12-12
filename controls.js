@@ -23,7 +23,7 @@ exports.ctl = function ($node, $) {
 function mapping(x, y) {
 	const coords = {
 		'0 50': 'gateon',
-		'100 50': 'gatehold',
+		'200 50': 'gatehold',
 		'0 100': 'gaterate',
 		
 		// midi11
