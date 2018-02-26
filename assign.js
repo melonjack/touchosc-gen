@@ -101,7 +101,7 @@ $('tabpage').each((page, item) => {
 		
 		$node.attr('color', labelColorByPageId(page));
 		
-		if (type === 'faderh' || type === 'rotaryh') {			
+		if (type === 'faderv' || type === 'faderh' || type === 'rotaryh') {			
 			if (page > 7 || type === 'rotaryh') {		
 
 				const coords = {
