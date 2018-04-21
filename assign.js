@@ -4,6 +4,7 @@ const fs = require('fs')
 const cheerio = require('cheerio');
 const {execSync} = require('child_process');
 const ctl = require('./controls').ctl;
+const midi = require('./controls').midi;
 var src = fs.readFileSync('./src/index.xml', 'utf8');
 const src_str = String(src);
 const beautify = require('xml-beautifier');
@@ -11,7 +12,7 @@ const beautify = require('xml-beautifier');
 const createMidi = ({
 	uid, channel, number, min = 0, max = 127, id = '', axis = 'x'
 }) => {
-	return channel ? 
+	return channel ?
 		//<midi var="y1" type="0" channel="12" data1="22" data2f="0" data2t="127" sysex=""/>
 		`<midi var ="${axis}${id}" type="0" channel="${channel}" data1="${number}" data2f="${min}" data2t="${max}" sysex="" />` :
 		'';
@@ -24,24 +25,6 @@ const createMidi = ({
 	return 'name="' + buf.toString('utf8') + '"';
 }
 
-function channel(alias) {
-	const dict = midi();
-
-	if (dict[10].indexOf(alias) !== -1) {
-		return 10;
-	}
-
-	if (dict[11].indexOf(alias) !== -1) {
-		return 11;
-	}
-
-	if (dict[12].indexOf(alias) !== -1) {
-		return 12;
-	}
-	
-	console.log(`unknown position: ${alias}`);
-}
-
 function number($node, alias, page) {
 	const dict = midi();
 	const c = channel(alias);
@@ -52,12 +35,12 @@ function number($node, alias, page) {
 	}
 
 	if (c === 11) {
-		// cc 31...39		
+		// cc 31...39
 		return (3 + page) * 10 + dict[11].indexOf(alias) + 1;
 	}
 
 	if (c === 12) {
-		// cc 21...29		
+		// cc 21...29
 		return (2 + page) * 10 + dict[12].indexOf(alias) + 1;
 	}
 
@@ -89,20 +72,20 @@ const labelColorByPageId = (pageId) => {
 	][pageId];
 }
 
-$('tabpage').each((page, item) => {
+$('tabpage').first().each((page, item) => {
 	const dict = midi();
 	const $ctl = $(item).find('control');
 
 	$(item).find('control').each((j, citem) => {
 		const $node = $(citem);
-		const alias = ctl($node, $);
+		const {alias, channel} = ctl($node, $);
 		// const nm = new Buffer($node.attr('name'), 'base64');
 		const type = $node.attr('type');
-		
+
 		$node.attr('color', labelColorByPageId(page));
-		
-		if (type === 'faderv' || type === 'faderh' || type === 'rotaryh') {			
-			if (page > 7 || type === 'rotaryh') {		
+
+		if (type === 'faderv' || type === 'faderh' || type === 'rotaryh') {
+			if (page > 7 || type === 'rotaryh') {
 
 				const coords = {
 					x: $node.attr('y'),
@@ -116,7 +99,7 @@ $('tabpage').each((page, item) => {
 					uid: j,
 					channel: 9,
 					number: '' + (y + 1) + '' + x
-				}))			
+				}))
 			} else {
 				$node.html(createMidi({
 					uid: j,
@@ -137,7 +120,7 @@ $('tabpage').each((page, item) => {
 					min: toggle8step ? toggleVal(k): [0, 127][k]/* assume toggle2step */,
 					max: toggle8step ? toggleVal(k): [0, 127][k],
 					id: k + 1
-				}))				
+				}))
 			}
 		} else if (type === 'multixy') {
 			$node.html(createMidi({
@@ -155,54 +138,13 @@ $('tabpage').each((page, item) => {
 				axis: 'x',
 				id: 1
 			}))
-		} 
+		}
 	})
 })
 
 
-function midi() {
-	const dict = {
-
-		// sends
-		// 1: [
-		// 	'deplaysteps',
-		// 	'delaymix',
-		// 	'reversesteps',
-		// 	'reversemix'
-		// ],
-		// gate
-		10: [
-		'gateon',
-		'gatehold',
-		'gaterate'
-		],
-		// pitcj
-		11: [
-		'pitchon',
-		'pitchrate',
-		'pitchsteps',
-		'pitchgate',
-		'pitchdis',
-		'rnd',
-		'choice',
-		'scale',
-		'drop',
-		],
-		// audio fx
-		12: [
-		'deplaytime',
-		'delayfb',
-		'delaymix',
-		'chor_delayfb',
-		'chor_mix',
-		'eros_cutres',
-		'eros_bw'
-		]
-	}
-	return dict;
-}
-
 console.log(process.cwd());
+
 process.chdir('dest');
 
 fs.writeFileSync('index.xml', $.html());
