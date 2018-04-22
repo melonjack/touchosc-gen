@@ -30,7 +30,6 @@ function labelColorByPageId (pageId) {
 	][pageId];
 }
 
-console.log(ctl)
 $('tabpage').each((page, item) => {
 
 	// SENDS
