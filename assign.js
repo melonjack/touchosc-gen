@@ -13,6 +13,7 @@ const createMidi = require('./create_midi').createMidi;
 const $ = cheerio.load(src_str, {xmlMode: true});
 
 function toggleVal(i) {
+	// ableton specific 128 rotary to 8 switch mapping
 	const vals = [0, 17, 33, 49, 66, 82, 100, 127];
 	return vals[i];
 }
