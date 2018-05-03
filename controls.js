@@ -36,8 +36,9 @@ function mapping(x, y) {
 		'250 200': {alias: 'pitchrate', chan: 11, cc: 3, type: '8step'},
 		'250 500': {alias: 'pitchsteps', chan: 11, cc: 4, type: '8step'},
 		'650 200': {alias: 'pitchdist', chan: 11, cc: 5, type: 'fader'},
-		'700 200': {alias: 'rnd', chan: 11, cc: 6, type: 'fader'},
-		'800 200': {alias: 'scale_choice', chan: 11, cc: 7, midi_y: {chan: 13, cc: 7}, type: 'xy' },
+		'750 200': {alias: 'rnd', chan: 11, cc: 6, type: 'fader'},
+		'800 200': {alias: 'scale_scale', chan: 11, cc: 7, type: 'fader' },
+		'850 200': {alias: 'scale_choice', chan: 11, cc: 8, type: 'fader' },
 		'950 200': {alias: 'drop', chan: 11, cc: 9, type: 'fader'},
 
 		// midi 12

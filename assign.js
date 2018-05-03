@@ -57,6 +57,9 @@ $('tabpage').each((page, item) => {
 	if (page < 8) {
 		$(item).find('control').each((j, citem) => {
 			const $node = $(citem);
+
+			$node.attr('color', labelColorByPageId(page));
+
 			if ($node.attr('type') === 'labelv') {
 				return;
 			}
@@ -72,8 +75,6 @@ $('tabpage').each((page, item) => {
 				type,
 				midi_y,
 			} = control;
-
-			$node.attr('color', labelColorByPageId(page));
 
 			if (type === 'fader') {
 				$node.html(createMidi({
