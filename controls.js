@@ -28,30 +28,34 @@ function mapping(x, y) {
 		// midi 10
 		'0 50': {alias: 'gateon', chan: 10, cc: 1, type: 'on_off'},
 		'0 100': {alias: 'gatehold', chan: 10, cc: 2, type: 'fader'},
-		'250 50': {alias: 'gaterate', chan: 10, cc: 3, type: '8step'},
+		'400 50': {alias: 'gaterate', chan: 10, cc: 3, type: '8step'},
 
 		// midi 11
 		'0 250': {alias: 'pitchon', chan: 11, cc: 1, type: 'on_off'},
-		'0 300': {alias: 'pitchhold', chan: 11, cc: 2, type: 'fader'},
-		'250 200': {alias: 'pitchrate', chan: 11, cc: 3, type: '8step'},
-		'250 500': {alias: 'pitchsteps', chan: 11, cc: 4, type: '8step'},
-		'650 200': {alias: 'pitchdist', chan: 11, cc: 5, type: 'fader'},
-		'750 200': {alias: 'rnd', chan: 11, cc: 6, type: 'fader'},
-		'800 200': {alias: 'scale_scale', chan: 11, cc: 7, type: 'fader' },
-		'850 200': {alias: 'scale_choice', chan: 11, cc: 8, type: 'fader' },
-		'950 200': {alias: 'drop', chan: 11, cc: 9, type: 'fader'},
+		'400 200': {alias: 'pitchrate', chan: 11, cc: 2, type: '8step'},
+		'400 300': {alias: 'pitchsteps', chan: 11, cc: 3, type: '8step'},
+		'0 300': {alias: 'pitchhold', chan: 11, cc: 4, type: 'fader'},
+		'800 200': {alias: 'pitchdist', chan: 11, cc: 5, type: 'fader'},
+		'900 50': {alias: 'rnd', chan: 11, cc: 6, type: 'fader'},
+		'900 200': {alias: 'scale_scale', chan: 11, cc: 7, type: 'fader' },
+		'950 200': {alias: 'scale_choice', chan: 11, cc: 8, type: 'fader' },
+		'275 100': {alias: 'drop', chan: 11, cc: 9, type: 'fader'},
 
-		// midi 12
-		'850 500': {alias: 'delayfb', chan: 12, cc: 1, type: 'fader'},
-		'900 500': {alias: 'delaymix', chan: 12, cc: 2, type: 'fader'},
-		'950 500': {alias: 'stereo', chan: 12, cc: 3, type: 'fader'},
-		'450 500': {alias: 'delay_left', chan: 12, cc: 4, type: '8step'},
-		'450 600': {alias: 'delay_right', chan: 12, cc: 5, type: '8step'},
+		// midi 12 + 13 as fallback
+		'500 500': {alias: 'delay_left', chan: 12, cc: 1, type: '8-2step'},
+		'500 600': {alias: 'delay_right', chan: 13, cc: 1, type: '8-2step'},
 
-		'0 500': {alias: 'chor_delayfb', chan: 12, cc: 6, midi_y: {chan: 13, cc: 6}, type: 'xy'},
-		'0 150': {alias: 'chor_mix', chan: 12, cc: 7, type: 'fader'},
+		'900 500': {alias: 'delayfb', chan: 12, cc: 2, type: 'fader'},
+		'950 500': {alias: 'delaymix', chan: 12, cc: 3, type: 'fader'},
 
-		'250 500': {alias: 'eros_cutres', chan: 12, cc: 8, midi_y: {chan: 13, cc: 8}, type: 'xy'},
+		'850 500': {alias: 'stereo', chan: 13, cc: 2, type: 'fader'},
+		'800 500': {alias: 'link', chan: 13, cc: 3, type: 'on_off'},
+
+		'0 500': {alias: 'chor_delayfb', chan: 12, cc: 4, midi_y: {chan: 13, cc: 4}, type: 'xy'},
+		'150 500': {alias: 'chor_mix', chan: 12, cc: 5, type: 'fader'},
+
+		'250 500': {alias: 'eros_freqwide', chan: 12, cc: 6, midi_y: {chan: 12, cc: 7}, type: 'xy'},
+		'400 500': {alias: 'eros_mix', chan: 13, cc: 6, type: 'fader'},
 	};
 	return coords[`${x} ${y}`];
 }

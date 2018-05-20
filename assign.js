@@ -95,6 +95,20 @@ $('tabpage').each((page, item) => {
 						id: k + 1
 					}))
 				}
+			} else if (type === '8-2step') {
+				$node.html('');
+				for (let k = 0; k < 6; k++) {
+					// generate only 6 steps and skip the last two for delay time
+					$node.attr('ex_mode', 'true');
+					$node.append(createMidi({
+						uid: k,
+						channel: chan,
+						number: ctl.arpNumber(cc, page),
+						min: toggleVal(k),
+						max: toggleVal(k),
+						id: k + 1
+					}))
+				}
 			} else if (type === 'on_off') {
 				$node.html('');
 				for (let k = 0; k < 2; k++) {
