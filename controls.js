@@ -37,8 +37,8 @@ function mapping(x, y) {
 		'0 300': {alias: 'pitchhold', chan: 11, cc: 4, type: 'fader'},
 		'800 200': {alias: 'pitchdist', chan: 11, cc: 5, type: 'fader'},
 		'900 50': {alias: 'rnd', chan: 11, cc: 6, type: 'fader'},
-		'900 200': {alias: 'scale_scale', chan: 11, cc: 7, type: 'fader' },
-		'950 200': {alias: 'scale_choice', chan: 11, cc: 8, type: 'fader' },
+		'900 200': {alias: 'scale_scale', chan: 11, cc: 8, type: 'fader' },
+		'950 200': {alias: 'scale_choice', chan: 11, cc: 7, type: 'fader' },
 		'275 100': {alias: 'drop', chan: 11, cc: 9, type: 'fader'},
 
 		// midi 12 + 13 as fallback
@@ -60,9 +60,12 @@ function mapping(x, y) {
 	return coords[`${x} ${y}`];
 }
 
-exports.arpNumber = function arpNumber(cc, page) {
-	const BASE_CC_NUMBER = 2;
-	const number = Number('' + (page + BASE_CC_NUMBER) + cc);
+exports.arpNumber = function arpNumber(cc, chan, page) {
+	// controls for chan 11 start from 31
+	// controls for chans 10, 12 and 13 start from 21
+	// oh me
+	const baseCCNumber = chan === 11 ? 3 : 2;
+	const number = Number('' + (page + baseCCNumber) + cc);
 	console.log('arp cc', number);
 	return number;
 }
