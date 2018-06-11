@@ -70,7 +70,6 @@ $('tabpage').each((pageId, item) => {
 				midi_y,
 			} = control;
 
-
 			if (type === 'fader') {
 				$node.html(createMidi({
 					uid: j,
