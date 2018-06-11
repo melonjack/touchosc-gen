@@ -31,10 +31,10 @@ function labelColorByPageId (pageId) {
 	][pageId];
 }
 
-$('tabpage').each((page, item) => {
+$('tabpage').each((pageId, item) => {
 
 	// SENDS
-	if (page === 8) {
+	if (pageId === 8) {
 		$(item).find('control').each((j, citem) => {
 			const $node = $(citem);
 			const coords = {
@@ -43,7 +43,7 @@ $('tabpage').each((page, item) => {
 			}
 			const x = 1 + coords.x/120;
 			const y = 1 + coords.y/120;
-			console.log('x', x, 'y', y, '' + (y + 1) + '' + x);
+			// console.log('x', x, 'y', y, '' + (y + 1) + '' + x);
 
 			$node.html(createMidi({
 				uid: j,
@@ -54,11 +54,55 @@ $('tabpage').each((page, item) => {
 		return;
 	}
 
-	if (page < 8) {
+	if (pageId === 9) {
+		$(item).find('control').each((j, citem) => {
+			const $node = $(citem);
+			const control = ctl.travelrCtl($node, $);
+			if (!control) {
+				throw new Error(`travelrCtl ERROR! type: ${$node.attr('type')}`)
+			}
+
+			const {
+				alias,
+				cc,
+				chan,
+				type,
+				midi_y,
+			} = control;
+
+
+			if (type === 'fader') {
+				$node.html(createMidi({
+					uid: j,
+					channel: chan,
+					number: cc,
+				}));
+			} else if (type === 'xy') {
+				$node.html(createMidi({
+					uid: j,
+					channel: chan,
+					number: cc,
+					axis: 'y',
+					id: 1
+
+				}));
+				$node.append(createMidi({
+					uid: j + 0.5,
+					channel: midi_y.chan,
+					number: midi_y.cc,
+					axis: 'x',
+					id: 1
+				}))
+			}
+		});
+	}
+
+	// ARPS
+	if (pageId < 8) {
 		$(item).find('control').each((j, citem) => {
 			const $node = $(citem);
 
-			$node.attr('color', labelColorByPageId(page));
+			$node.attr('color', labelColorByPageId(pageId));
 
 			if ($node.attr('type') === 'labelv') {
 				return;
@@ -66,7 +110,7 @@ $('tabpage').each((page, item) => {
 
 			const control = ctl.arpCtl($node, $);
 			if (!control) {
-				throw $node.attr('type')
+				throw new Error(`arpCtl ERROR! type: ${$node.attr('type')}`)
 			}
 			const {
 				alias,
@@ -80,7 +124,7 @@ $('tabpage').each((page, item) => {
 				$node.html(createMidi({
 					uid: j,
 					channel: chan,
-					number: ctl.arpNumber(cc, chan, page)
+					number: ctl.arpNumber(cc, chan, pageId)
 				}));
 			} else if (type === '8step') {
 				$node.html('');
@@ -89,7 +133,7 @@ $('tabpage').each((page, item) => {
 					$node.append(createMidi({
 						uid: k,
 						channel: chan,
-						number: ctl.arpNumber(cc, chan, page),
+						number: ctl.arpNumber(cc, chan, pageId),
 						min: toggleVal(k),
 						max: toggleVal(k),
 						id: k + 1
@@ -103,7 +147,7 @@ $('tabpage').each((page, item) => {
 					$node.append(createMidi({
 						uid: k,
 						channel: chan,
-						number: ctl.arpNumber(cc, chan, page),
+						number: ctl.arpNumber(cc, chan, pageId),
 						min: toggleVal(k),
 						max: toggleVal(k),
 						id: k + 1
@@ -116,7 +160,7 @@ $('tabpage').each((page, item) => {
 					$node.append(createMidi({
 						uid: k,
 						channel: chan,
-						number: ctl.arpNumber(cc, chan, page),
+						number: ctl.arpNumber(cc, chan, pageId),
 						min: [0, 127][k],
 						max: [0, 127][k],
 						id: k + 1
@@ -126,7 +170,7 @@ $('tabpage').each((page, item) => {
 				$node.html(createMidi({
 					uid: j,
 					channel: chan,
-					number: ctl.arpNumber(cc, chan, page),
+					number: ctl.arpNumber(cc, chan, pageId),
 					axis: 'y',
 					id: 1
 
@@ -134,7 +178,7 @@ $('tabpage').each((page, item) => {
 				$node.append(createMidi({
 					uid: j + 0.5,
 					channel: midi_y.chan,
-					number: ctl.arpNumber(midi_y.cc, midi_y.chan, page),
+					number: ctl.arpNumber(midi_y.cc, midi_y.chan, pageId),
 					axis: 'x',
 					id: 1
 				}))
