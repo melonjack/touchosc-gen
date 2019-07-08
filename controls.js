@@ -6,7 +6,7 @@ const getXY = ($node, $) => {
 	const y = 768 - 40 - Number($node.attr('x')) - Number($node.attr('w'));
 
 	const errors = [];
-	const tabName = new Buffer($($node).parents('tabpage').attr('name'), 'base64');
+	const tabName = Buffer.from($($node).parents('tabpage').attr('name'), 'base64');
 	// console.log(`tabpage ${tabName}, ${x} ${y} ${n}`);
 	if ( x % 5 !== 0 || y % 5 !== 0) {
 		// errors.push(`tabpage ${tabName}, ${x} ${y} ${n} incorrect position, should be divided by 5`);
@@ -21,52 +21,52 @@ const getXY = ($node, $) => {
 	return {x,y};
 }
 
-exports.arpCtl = function arpCtl($node, $) {
+exports.arpCtl = function arpCtl($node, $, pageId) {
 	const {x, y, err} = getXY($node, $);
 	if (err) {
 		console.log('arpCtl', err);
 		return {};
 	}
-	return arpMapping(x, y);
+	return arpMapping(x, y, pageId);
 };
 
 /*
 start controls from 21:
 assigned_cc = page index + 20 + control_cc
 */
-function arpMapping(x, y) {
+function arpMapping(x, y, pageId) {
 	const coords = {
 		// midi 10
-		'0 50': {alias: 'gateon', chan: 10, cc: 1, type: 'on_off'},
-		'0 100': {alias: 'gatehold', chan: 10, cc: 2, type: 'fader'},
+		'200 50': {alias: 'rndarp_launchcontrol', chan: 7, cc_strict: 21, type: 'fader'},
+
+        '25 50': {alias: 'gate_length', chan: 10, cc: 2, type: 'fader'},
 		'400 50': {alias: 'gaterate', chan: 10, cc: 3, type: '8step'},
+
+        '50 500': {alias: 'attack', chan: 10, cc: 4, type: 'fader'},
+        '100 500': {alias: 'decay', chan: 10, cc: 5, type: 'fader'},
+        '150 500': {alias: 'sustain', chan: 10, cc: 6, type: 'fader'},
+        '200 500': {alias: 'release', chan: 10, cc: 7, type: 'fader'},
+        '300 525': {alias: 'volume', chan: 10, cc: 8, type: 'fader'},
 
 		// midi 11
 		'0 250': {alias: 'pitchon', chan: 11, cc: 1, type: 'on_off'},
 		'400 200': {alias: 'pitchrate', chan: 11, cc: 2, type: '8step'},
 		'400 300': {alias: 'pitchsteps', chan: 11, cc: 3, type: '8step'},
-		'0 300': {alias: 'pitchhold', chan: 11, cc: 4, type: 'fader'},
+		'25 225': {alias: 'pitchhold', chan: 11, cc: 4, type: 'fader'},
 		'800 200': {alias: 'pitchdist', chan: 11, cc: 5, type: 'fader'},
 		'900 50': {alias: 'rnd', chan: 11, cc: 6, type: 'fader'},
 		'900 200': {alias: 'scale_scale', chan: 11, cc: 8, type: 'fader' },
 		'950 200': {alias: 'scale_choice', chan: 11, cc: 7, type: 'fader' },
-		'275 100': {alias: 'drop', chan: 11, cc: 9, type: 'fader'},
+		'200 225': {alias: 'drop', chan: 11, cc: 9, type: 'fader'},
 
 		// midi 12 + 13 as fallback
 		'500 500': {alias: 'delay_left', chan: 12, cc: 1, type: '8-2step'},
 		'500 600': {alias: 'delay_right', chan: 13, cc: 1, type: '8-2step'},
 
-		'900 500': {alias: 'delayfb', chan: 12, cc: 2, type: 'fader'},
-		'950 500': {alias: 'delaymix', chan: 12, cc: 3, type: 'fader'},
-
-		'850 500': {alias: 'stereo', chan: 13, cc: 2, type: 'fader'},
-		'800 500': {alias: 'link', chan: 13, cc: 3, type: 'on_off'},
-
-		'0 500': {alias: 'chor_delayfb', chan: 12, cc: 4, midi_y: {chan: 13, cc: 4}, type: 'xy'},
-		'150 500': {alias: 'chor_mix', chan: 12, cc: 5, type: 'fader'},
-
-		'250 500': {alias: 'eros_freqwide', chan: 12, cc: 6, midi_y: {chan: 12, cc: 7}, type: 'xy'},
-		'400 500': {alias: 'eros_mix', chan: 13, cc: 6, type: 'fader'},
+		'800 500': {alias: 'delayfb', chan: 12, cc: 2, type: 'fader'},
+		'850 500': {alias: 'link', chan: 13, cc: 3, type: 'on_off'},
+		'900 500': {alias: 'gain', chan: 13, cc: 2, type: 'fader'},
+		'950 500': {alias: 'delaymix', chan: 12, cc: 3, type: 'fader'}
 	};
 	return coords[`${x} ${y}`];
 }
@@ -79,6 +79,10 @@ exports.arpNumber = function arpNumber(cc, chan, page) {
 	// we want 1 + 1 = 11 (int)
 	const number = Number('' + (page + baseCCNumber) + cc);
 	return number;
+}
+
+exports.arpNumberStrict = function arpNumberStrict(cc, pageId) {
+    return cc + pageId;
 }
 
 exports.sendsCtl = function sendsCtl($node) {
