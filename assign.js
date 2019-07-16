@@ -33,24 +33,51 @@ function labelColorByPageId(pageId) {
 
 $('tabpage').each((pageId, item) => {
 
-    // SENDS
+    // PERCS
     if (pageId === 8) {
         $(item).find('control').each((j, citem) => {
             const $node = $(citem);
-            const coords = {
-                x: $node.attr('y'),
-                y: 768 - 40 - Number($node.attr('x')) - Number($node.attr('w'))
-            }
-            const x = 1 + coords.x / 120;
-            const y = 1 + coords.y / 120;
-            // console.log('x', x, 'y', y, '' + (y + 1) + '' + x);
 
-            $node.html(createMidi({
-                uid: j,
-                channel: 9,
-                number: '' + (y + 1) + '' + x
-            }))
+            $node.attr('color', labelColorByPageId(pageId));
+
+            if ($node.attr('type') === 'labelv') {
+                return;
+            }
+
+            const control = ctl.arpCtl($node, $, pageId + 1);
+            if (!control) {
+                throw new Error(`arpCtl ERROR! type: ${$node.attr('type')}`)
+            }
+            const {
+                alias,
+                cc,
+                chan = 7,
+                type,
+            } = control;
+
+            if (type === 'fader') {
+                $node.html(createMidi({
+                    uid: j,
+                    channel: chan,
+                    number: cc
+                }));
+            } else if (type === 'on_off') {
+                $node.html('');
+                for (let k = 0; k < 2; k++) {
+                    $node.attr('ex_mode', 'true');
+                    $node.append(createMidi({
+                        uid: k,
+                        channel: chan,
+                        number: cc,
+                        min: [0, 127][k],
+                        max: [0, 127][k],
+                        id: k + 1
+                    }))
+                }
+            }
+
         });
+
         return;
     }
 

@@ -148,3 +148,92 @@ function travelrMapping(x, y) {
 
 	return control;
 }
+
+exports.percsCtl = function ($node, $, pageId) {
+    
+	const {x, y, err} = getXY($node, $);
+	if (err) {
+		console.log('travelrCtl', err);
+		return {};
+	}
+	return travelrMapping(x, y);
+
+}
+
+function percsMapping(x, y) {
+    const coords = {
+        // 1 line
+        '25 25': {cc: 13, type: 'fader', alias: 'a1'},
+        '150 25': {cc: 14, type: 'fader', alias: 'a2'},
+        '275 25': {cc: 15, type: 'fader', alias: 'a3'},
+        '400 25': {cc: 16, type: 'fader', alias: 'a4'},
+        '525 25': {cc: 17, type: 'fader', alias: 'a5'},
+        '650 25': {cc: 18, type: 'fader', alias: 'a6'},
+        '775 25': {cc: 19, type: 'fader', alias: 'a7'},
+        '900 25': {cc: 20, type: 'fader', alias: 'a8'},
+
+        // 2 line
+        '25 150': {cc: 29, type: 'fader', alias: 'b1'},
+        '150 150': {cc: 30, type: 'fader', alias: 'b2'},
+        '275 150': {cc: 31, type: 'fader', alias: 'b3'},
+        '400 150': {cc: 32, type: 'fader', alias: 'b4'},
+        '525 150': {cc: 33, type: 'fader', alias: 'b5'},
+        '650 150': {cc: 34, type: 'fader', alias: 'b6'},
+        '775 150': {cc: 35, type: 'fader', alias: 'b7'},
+        '900 150': {cc: 36, type: 'fader', alias: 'b8'},
+        
+        // 3 line
+        '25 275': {cc: 21, type: 'fader', alias: 'rnd1'},
+        '150 275': {cc: 22, type: 'fader', alias: 'rnd2'},
+        '275 275': {cc: 23, type: 'fader', alias: 'rnd3'},
+        '400 275': {cc: 24, type: 'fader', alias: 'rnd4'},
+        '525 275': {cc: 25, type: 'fader', alias: 'rnd5'},
+        '650 275': {cc: 26, type: 'fader', alias: 'rnd6'},
+        '775 275': {cc: 27, type: 'fader', alias: 'rnd7'},
+        '900 275': {cc: 28, type: 'fader', alias: 'rnd8'},
+        
+        // faders
+        '50 400': {cc: 41, type: 'fader', alias: 'vol1'},
+        '175 400': {cc: 42, type: 'fader', alias: 'vol2'},
+        '300 400': {cc: 43, type: 'fader', alias: 'vol3'},
+        '425 400': {cc: 44, type: 'fader', alias: 'vol4'},
+        '550 400': {cc: 45, type: 'fader', alias: 'vol5'},
+        '675 400': {cc: 46, type: 'fader', alias: 'vol6'},
+        '800 400': {cc: 47, type: 'fader', alias: 'vol7'},
+        '925 400': {cc: 48, type: 'fader', alias: 'vol8'},
+        
+        // delay1
+        '25 625': {cc: 89, type: 'on_off', alias: 'delay_a1'},
+        '150 625': {cc: 90, type: 'on_off', alias: 'delay_a2'},
+        '275 625': {cc: 91, type: 'on_off', alias: 'delay_a3'},
+        '400 625': {cc: 92, type: 'on_off', alias: 'delay_a4'},
+        '525 625': {cc: 93, type: 'on_off', alias: 'delay_a5'},
+        '650 625': {cc: 94, type: 'on_off', alias: 'delay_a6'},
+        '775 625': {cc: 95, type: 'on_off', alias: 'delay_a7'},
+        '900 625': {cc: 96, type: 'on_off', alias: 'delay_a8'},
+
+        // delay2
+        '25 675': {cc: 9, type: 'on_off', alias: 'delay_a1'},
+        '150 675': {cc: 10, type: 'on_off', alias: 'delay_a2'},
+        '275 675': {cc: 11, type: 'on_off', alias: 'delay_a3'},
+        '400 675': {cc: 12, type: 'on_off', alias: 'delay_a4'},
+        '525 675': {cc: 13, type: 'on_off', alias: 'delay_a5'},
+        '650 675': {cc: 14, type: 'on_off', alias: 'delay_a6'},
+        '775 675': {cc: 15, type: 'on_off', alias: 'delay_a7'},
+        '900 675': {cc: 16, type: 'on_off', alias: 'delay_a8'},
+
+
+
+
+
+
+    }
+
+	const key = `${x} ${y}`;
+	// console.log(x, y, key)
+	const {type, alias, cc} = coords[key];
+	const control = {alias, type, chan: 8};
+
+	return control;    
+}
+
