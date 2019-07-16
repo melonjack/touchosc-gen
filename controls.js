@@ -153,10 +153,10 @@ exports.percsCtl = function ($node, $, pageId) {
     
 	const {x, y, err} = getXY($node, $);
 	if (err) {
-		console.log('travelrCtl', err);
+		console.log('percsCtl', err);
 		return {};
 	}
-	return travelrMapping(x, y);
+	return percsMapping(x, y);
 
 }
 
@@ -213,26 +213,20 @@ function percsMapping(x, y) {
         '900 625': {cc: 96, type: 'on_off', alias: 'delay_a8'},
 
         // delay2
-        '25 675': {cc: 9, type: 'on_off', alias: 'delay_a1'},
-        '150 675': {cc: 10, type: 'on_off', alias: 'delay_a2'},
-        '275 675': {cc: 11, type: 'on_off', alias: 'delay_a3'},
-        '400 675': {cc: 12, type: 'on_off', alias: 'delay_a4'},
-        '525 675': {cc: 13, type: 'on_off', alias: 'delay_a5'},
-        '650 675': {cc: 14, type: 'on_off', alias: 'delay_a6'},
-        '775 675': {cc: 15, type: 'on_off', alias: 'delay_a7'},
-        '900 675': {cc: 16, type: 'on_off', alias: 'delay_a8'},
-
-
-
-
-
-
+        '25 675': {cc: 9, type: 'note', alias: 'delay_a1'},
+        '150 675': {cc: 10, type: 'note', alias: 'delay_a2'},
+        '275 675': {cc: 11, type: 'note', alias: 'delay_a3'},
+        '400 675': {cc: 12, type: 'note', alias: 'delay_a4'},
+        '525 675': {cc: 25, type: 'note', alias: 'delay_a5'},
+        '650 675': {cc: 26, type: 'note', alias: 'delay_a6'},
+        '775 675': {cc: 27, type: 'note', alias: 'delay_a7'},
+        '900 675': {cc: 28, type: 'note', alias: 'delay_a8'},
     }
 
 	const key = `${x} ${y}`;
 	// console.log(x, y, key)
 	const {type, alias, cc} = coords[key];
-	const control = {alias, type, chan: 8};
+	const control = {alias, type, chan: 7, cc};
 
 	return control;    
 }

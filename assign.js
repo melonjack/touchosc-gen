@@ -38,15 +38,15 @@ $('tabpage').each((pageId, item) => {
         $(item).find('control').each((j, citem) => {
             const $node = $(citem);
 
-            $node.attr('color', labelColorByPageId(pageId));
+            // $node.attr('color', labelColorByPageId(pageId));
 
             if ($node.attr('type') === 'labelv') {
                 return;
             }
 
-            const control = ctl.arpCtl($node, $, pageId + 1);
+            const control = ctl.percsCtl($node, $, pageId + 1);
             if (!control) {
-                throw new Error(`arpCtl ERROR! type: ${$node.attr('type')}`)
+                throw new Error(`percsCtl ERROR! type: ${$node.attr('type')}`)
             }
             const {
                 alias,
@@ -72,6 +72,20 @@ $('tabpage').each((pageId, item) => {
                         min: [0, 127][k],
                         max: [0, 127][k],
                         id: k + 1
+                    }))
+                }
+            } else if (type === 'note') {
+                $node.html('');
+                for (let k = 0; k < 2; k++) {
+                    $node.attr('ex_mode', 'true');
+                    $node.append(createMidi({
+                        uid: k,
+                        channel: chan,
+                        number: cc,
+                        min: [0, 127][k],
+                        max: [0, 127][k],
+                        id: k + 1,
+                        type: 1,
                     }))
                 }
             }
